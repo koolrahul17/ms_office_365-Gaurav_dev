@@ -105,7 +105,7 @@
 - name: Get Id for VPN ## Added for Movers - VPN request
   block:
     - uri:
-        url: "{{ groups_uri }}?$filter=displayName%20eq%20'{{ user_packet.future_vpn }}'&$select=id"
+        url: "{{ groups_uri }}?$filter=displayName%20eq%20'{{ user_packet.vpn }}'&$select=id"
         method: GET
         return_content: yes
         headers:
