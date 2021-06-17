@@ -1,0 +1,45 @@
+- name: Get API for {{ api_url }}
+  uri:
+    url: "{{ api_url }}"
+    method: GET
+    return_content: yes
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+      Authorization: "Bearer {{ ms_online_access_token }}"
+    validate_certs: false
+    status_code: 200
+  register: get_api_result
+  when: uri_method == 'GET'
+
+- debug:
+    msg: "{{ get_api_result }}"
+
+- debug:
+    msg: "{{ req_body }}"
+
+- set_fact:
+    get_api_result: "{{ get_api_result }}"
+
+- set_fact:
+    "{{ fact_var }}" : "{{ get_api_result }}"
+  when: setfact is true and get_api_result is defined
+
+- name: POSTING
+  uri:
+    url: "{{ api_url }}"
+    method: POST
+    return_content: yes
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Bearer {{ ms_online_access_token }}"
+    validate_certs: false
+    status_code: 201
+    body: "{{ req_body }}"
+    body_format: json
+
+  register: post_api_details
+  when: uri_method == 'POST'
+
+- set_fact:
+    "{{ fact_var }}" : "{{ post_api_details }}"
+  when: setfact is true and post_api_details is defined

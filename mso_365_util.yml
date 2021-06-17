@@ -1,0 +1,51 @@
+- name: microsoft Office 365 Operations
+  hosts: localhost
+  connection: localhost
+  vars:
+    msonline_url: "https://login.microsoftonline.com:443"
+    tenant_id: "4c0a7869-83c7-4f2f-8bfe-676b314817cd"
+    auth_token_uri: "oauth2/v2.0/token"
+    grant_type: "client_credentials"
+    client_id: "457a9061-80d6-4fc2-a433-5ce31eb1c9b8"
+    client_secret: "3po4N3NLGVx_u5EPAt-cRmHAE5T-05-as."
+    ms_graph_uri: "https://graph.microsoft.com"
+    default_scope: "https://graph.microsoft.com/.default"
+    get_user_url_details_uri: "{{ ms_graph_uri }}/v1.0/users/ravind@M365x033589.OnMicrosoft.com"
+    create_user_uri: "{{ ms_graph_uri }}/v1.0/users"
+    manager_url: "{{ ms_graph_uri }}/v1.0/users/samdezoza1@M365x033589.OnMicrosoft.com/manager/$ref"
+    run: false
+
+  # tasks:
+  #   - name: Import the foo role
+  #     import_role:
+  #       name: foo
+  #     tags:
+  #       - bar
+  #       - baz
+
+  tasks:
+    - name: Get access token for ms office 365
+      uri:
+        url: "{{ msonline_url }}/{{ tenant_id }}/{{ auth_token_uri }}"
+        method: POST
+        return_content: yes
+        headers:
+          Content-Type: "application/x-www-form-urlencoded"
+        body: "grant_type={{ grant_type }}&client_id={{ client_id }}&client_secret= {{ client_secret }}&scope={{ default_scope }}"
+        body_format: json
+        validate_certs: false
+        status_code: 200
+      delegate_to: localhost
+      register: update
+
+    - debug:
+        msg: "{{ update.json.access_token }}"
+
+    - set_fact:
+        ms_online_access_token: "{{ update.json.access_token }}"
+    - name: Importing role
+      include_role:
+        name: common_utilities
+        tasks_from: api_request
+      tags:
+        - get_apis

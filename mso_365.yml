@@ -1,0 +1,21 @@
+
+- name: Microsoft Office 365 Operations
+  hosts: localhost
+  vars_files:
+    - mso_365_api_urls.yml
+  pre_tasks:
+     - import_role:
+         name: common_utilities
+         tasks_from: pre_reqs
+     - import_role:
+         name: common_utilities
+         tasks_from: get_resource_details
+  roles:
+     - { role: mso_joiner, when: cartridge_form_id  == 'JOINER' }
+     - { role: mso_mover,  when: cartridge_form_id  == 'MOVER' }
+     - { role: mso_leaver, when: cartridge_form_id == 'LEAVER' }
+
+  post_tasks:
+     - import_role:
+         name: common_utilities
+         tasks_from: generate_report       

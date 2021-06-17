@@ -1,0 +1,27 @@
+---
+- name: check user replication
+  block:
+     - shell: |
+          user="{{userName}}"
+          token={{ms_online_access_token}}
+          result="$(curl -s -i -X GET -H "Accept: */*" -H "Content-Type: application/x-www-form-urlencoded" -H "Authorization: Bearer $token" "https://graph.microsoft.com/v1.0/users/$user")"
+          if grep -q "does not exist" <<< "$result"; then
+              user=not_replicated
+          else
+             user=replicated
+          fi
+          echo $user
+
+       register: replication
+       until: replication.stdout == "replicated"
+       retries: 6
+       delay: 10
+       ignore_errors: true
+
+
+- set_fact:
+       user_repilcated: "{{replication.stdout}}"
+  when: replication is defined
+
+- debug:
+    msg: user_replicated

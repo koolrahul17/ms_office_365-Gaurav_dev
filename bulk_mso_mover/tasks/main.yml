@@ -1,0 +1,11 @@
+---
+# tasks file for mso_mover
+- import_role:
+         name: bulk_common_utilities
+         tasks_from: pre_reqs
+- import_role:
+         name: bulk_common_utilities
+         tasks_from: get_resource_details
+     
+- include_tasks: mso_mover_ad.yml
+# - include_tasks: mso_mover_storage.yml

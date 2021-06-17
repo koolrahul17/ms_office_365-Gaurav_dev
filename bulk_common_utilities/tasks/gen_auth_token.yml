@@ -1,0 +1,20 @@
+
+- name: Get access token for ms office 365 {{ msonline_url }}/{{ tenant_id }}/{{ auth_token_uri }}
+  uri:
+    url: "{{ msonline_url }}/{{ tenant_id }}/{{ auth_token_uri }}"
+    method: POST
+    return_content: yes
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+    body: "grant_type={{ grant_type }}&client_id={{ client_id }}&client_secret= {{ client_secret }}&scope={{ default_scope }}"
+    body_format: json
+    validate_certs: false
+    status_code: 200
+  delegate_to: localhost
+  register: update
+
+- set_fact:
+    ms_online_access_token: "{{ update.json.access_token }}"
+
+- debug:
+    msg: "{{ ms_online_access_token }}"

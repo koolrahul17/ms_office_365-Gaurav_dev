@@ -1,0 +1,38 @@
+---
+- name: update status
+  block:
+      - uri:
+          url: "{{ appConnect_url }}/{{ update_service_request }}"
+          method: PUT
+          return_content: yes
+          headers:
+            X-IBM-Client-Id: "{{ appConnectApiKey }}"
+          body:
+            ticket_number: "{{ ritm_req_number }}"
+            ticket_data:
+              work_notes: "{{ work_notes_status_msg }}"
+              state: "{{ Status }}"
+          body_format: json
+          validate_certs: false
+          status_code: 200
+        delegate_to: localhost
+        register: update
+      - set_fact:
+              ticket_update_status: "Successful"  
+  rescue:
+      - set_fact:
+              ticket_update_status: "Error"
+    
+      - import_role:
+          name: bulk_common_utilities
+          tasks_from: logging
+        vars:
+          exception: "{{ update }}"
+          task_name: update status
+          is_all_task_success: "No"
+
+
+
+- set_fact:
+        ticket_update_status_msgs: "{{ticket_update_status_msgs}},{{ticket_update_status}}"
+

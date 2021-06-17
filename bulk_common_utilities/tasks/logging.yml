@@ -1,0 +1,126 @@
+
+- name: getting current Time
+  setup:
+    gather_subset:
+      - date_time
+  register: playEndTime
+
+- name: Get std_err_msg if present.
+  set_fact:
+    stderr_lines: "{{ exception.stderr_lines | replace(',',' ') | replace('\n',' ') if (exception.stderr_lines is defined) else '' }} "
+  #when: exception.stderr_lines is defined
+
+- name: Get exception msg if present.
+  set_fact:
+    msg_lines: "{{ exception.msg | replace(',',' ') | replace(',',' ') | replace('\n',' ')  if (exception.msg is defined) else '' }}"
+  #when: exception.msg is defined
+
+- name: Get exception module_stderr if present.
+  set_fact:
+    module_stderr: "{{ exception.module_stderr | replace(',',' ') | replace('\n',' ')  if (exception.module_stderr is defined) else ''}}"
+  #when: exception.module_stderr is defined
+
+- name: Get exception module_stderr if present.
+  set_fact:
+    exceptionMsg: '{{ msg_lines}} :: {{ stderr_lines }} :: {{ module_stderr }}'
+
+- name: Exception Message
+  debug:
+    msg: "{{ exceptionMsg }}"
+
+- name: Update log file
+  lineinfile:
+    path: "{{ report_file_name }}"
+    line: "{{ req_no_creation_date }},{{ playStartDate }},,,{{req_account_name}},{{ansible_play_name}},{{req_no}},{{req_short_description}},{{cartridge_form_id}},{{ task_name }}, {{ is_all_task_success }}, {{ inventory_hostname }}, {{ exceptionMsg }}"
+    create: yes
+  delegate_to: localhost
+
+- name: update service now in logging
+  block:
+    - uri:
+        url: "{{ appConnect_url }}/{{ update_status_uri }}"
+        method: PUT
+        return_content: yes
+        headers:
+          X-IBM-Client-Id: "{{ appConnectApiKey }}"
+        body:
+          ticket_number: "{{ req_no }}"
+          ticket_data:
+            work_notes: "Exception while executing {{ task_name }} in {{ inventory_hostname }}. \r\r Exception Details \r{{ exception }}"
+            state: "{{ failedState }}"
+        body_format: json
+        validate_certs: false
+        status_code: 200
+      delegate_to: localhost
+      register: update
+  #when: terminateplay is defined and terminateplay is true
+    - uri:
+        url: "{{ appConnect_url }}/{{ update_status_uri }}"
+        method: PUT
+        return_content: yes
+        headers:
+          X-IBM-Client-Id: "{{ appConnectApiKey }}"           
+        body:
+          ticket_number: "{{ ritm_req_no }}"
+          ticket_data:
+            work_notes: "{{ statusMsg }}"
+            state: "{{ status }}"
+        body_format: json
+        validate_certs: false
+        status_code: 200
+      delegate_to: localhost
+      register: update
+      when: update_ritm is defined and update_ritm == true
+
+  rescue:
+    - lineinfile:
+        path: "{{ report_file_name }}"
+        line: "{{ req_no_creation_date }},{{ playStartDate }},,,{{req_account_name}},{{ansible_play_name}},{{req_no}},{{req_short_description}},{{cartridge_form_id}},update service now in logging, {{ is_all_task_success }}, {{ inventory_hostname }}, Error while updating Servicenow or RITM - {{ update.msg }}"
+        create: yes
+      delegate_to: localhost
+    - uri:
+        url: "{{ ms_graph_uri }}/v1.0/users/{{admin_user}}/sendMail"
+        method: POST
+        return_content: yes
+        headers:
+          Content-Type: "application/json"
+          Authorization: "Bearer {{ ms_online_access_token }}"
+        body: |-
+                {
+                "message": {
+                    "subject": "JML Process flow failed for {{ req_no }} and Servicenow NOT UPDATED",
+                    "body": {
+                    "contentType": "Text",
+                    "content": '{{ update.msg }}'
+                    },
+                    "toRecipients": [
+                    {
+                        "emailAddress": {
+                        "address": "{{ requestor_email }}"
+                        }
+                    }
+                    ],
+                    "ccRecipients": [
+                    {
+                        "emailAddress": {
+                        "address": "{{ manager_email }}"
+                        }
+                    }
+                    ]
+                },
+                "saveToSentItems": "true"
+                }
+        body_format: json
+        validate_certs: false
+        status_code: 202
+      delegate_to: localhost
+- name: Register dummy host with variable
+  add_host:
+    name: "DUMMY_HOST"
+    any_task_failed: "yes"
+
+- name: setting fact for play terminate
+  set_fact:
+    playTerminateInitiated: true
+
+#- meta: end_play

@@ -1,0 +1,55 @@
+---
+
+- debug:
+       msg: "{{cc_email_address1}}"
+
+- debug:
+     msg: "{{cc_email_address2}}"
+
+- uri:
+    url: "{{ ms_graph_uri }}/v1.0/users/{{admin_user}}/sendMail"
+    method: POST
+    return_content: yes
+    headers:
+      Content-Type: "application/json"
+      Authorization: "Bearer {{ ms_online_access_token }}"
+    body: |-
+            {
+            "message": {
+                "subject": "{{ mail_subject }}",
+                "body": {
+                "contentType": "Text",
+                "content": '{{ mail_content }}'
+                },
+                "toRecipients": [
+                {
+                    "emailAddress": {
+                    "address": "{{ to_email_address }}"
+                    }
+                }
+                ],
+                "ccRecipients": [
+                {
+                    "emailAddress": {
+                    "address": "{{ cc_email_address1 }}"
+                    }
+                },
+                {
+                    "emailAddress": {
+                    "address": "{{ cc_email_address2 }}"
+                    }
+                }
+                ],
+                "from": 
+                {
+                    "emailAddress": {
+                    "address": "{{ default_noreply_mailbox }}"
+                    }
+                }
+            },
+            "saveToSentItems": "true"
+            }
+    body_format: json
+    validate_certs: false
+    status_code: 202
+  delegate_to: localhost

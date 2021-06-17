@@ -1,0 +1,51 @@
+---
+
+#password only needed for joiner flow, not for mover and leaver
+
+    - name: "{{ pre_task_set_start_time }}"
+      set_fact:
+        playStartDate: "{{ ansible_date_time.date }}"
+        playStartTime: "{{ ansible_date_time.time }}"
+        playTerminateInitiated: false
+      delegate_to: localhost
+
+    - name: Get access token for ms office 365 {{ msonline_url }}/{{ tenant_id }}/{{ auth_token_uri }}
+      uri:
+        url: "{{ msonline_url }}/{{ tenant_id }}/{{ auth_token_uri }}"
+        method: POST
+        return_content: yes
+        headers:
+          Content-Type: "application/x-www-form-urlencoded"
+        body: "grant_type={{ grant_type }}&client_id={{ client_id }}&client_secret= {{ client_secret }}&scope={{ default_scope }}"
+        body_format: json
+        validate_certs: false
+        status_code: 200
+      delegate_to: localhost
+      register: token_request
+
+    - set_fact:
+        ms_online_access_token: "{{ token_request.json.access_token }}"
+
+    - debug:
+        msg: "{{ ms_online_access_token }}"
+
+
+    - name: Generating password
+      set_fact:
+        mail_pwd: "{{ lookup('password', '/dev/null length={{ password_len }} chars=ascii_letters,digits,#<>()_-!,hexdigits') + lookup('password', '/dev/null length={{ password_len }} chars=digits') + lookup('password', '/dev/null length={{ password_len }} chars=#<>()_-!') + lookup('password', '/dev/null length={{ password_len }} chars=hexdigits') }}"
+      when: (action == 'JOINER_BULK')
+
+    - name: set password for user creation
+      set_fact:
+        initial_user_password: "{{ mail_pwd }}"
+      delegate_to: localhost
+      when: (action == 'JOINER_BULK')
+
+    
+    - name: copy report CSV Template
+      template:
+        src: templates/report_csv.j2
+        dest: "{{ report_file_name }}"
+        force: no
+      delegate_to: localhost
+      when: first_iteration_count

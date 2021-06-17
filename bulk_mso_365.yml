@@ -1,0 +1,38 @@
+
+- name: Microsoft Office 365 Operations
+  hosts: localhost
+  vars_files:
+    - mso_365_api_urls.yml
+  tasks:
+     - include_role:
+          name: bulk_mso_joiner
+       vars:
+         user_packet: "{{ outer_item }}"
+         last_iteration_count: "{{ansible_loop.last}}"
+         first_iteration_count: "{{ansible_loop.first}}"
+         user_sequence: "{{user_count}}"
+       loop: "{{ req_details }}"
+       loop_control:
+               loop_var: outer_item
+               extended: yes
+               index_var: user_count
+       when: cartridge_form_id == 'JOINER_BULK'
+
+      - include_role:
+          name: bulk_mso_mover
+       vars:
+         user_packet: "{{ outer_item }}"
+         last_iteration_count: "{{ansible_loop.last}}"
+         first_iteration_count: "{{ansible_loop.first}}"
+         user_sequence: "{{user_count}}"
+       loop: "{{ req_details }}"
+       loop_control:
+               loop_var: outer_item
+               extended: yes
+               index_var: user_count
+       when: cartridge_form_id == 'MOVER_BULK'
+  
+  post_tasks:
+        - import_role:
+                 name: bulk_common_utilities
+                 tasks_from: generate_report

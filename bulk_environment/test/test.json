@@ -1,0 +1,76 @@
+{ 
+        "cartridge_id": "JML_BULK",
+        "cartridge_form_id": "JOINER_BULK",
+        "req_account_name": "IBM",
+        "req_no": "REQ0011971",
+        "req_sys_id": "bb6154861be0e810bb05106a234bcbb9",
+        "req_no_creation_date": "2020-11-19 06:16:11",
+        "req_short_description": "On-boarding bulk employees",
+        "manager_name" : "DigiWas.Manager",             
+        "manager_email" : "Digiwas.manager@dws-ipa.com",                                    
+        "requestor_name" : "Digiwas.HR",
+        "requestor_email" : "Digiwas.hr@dws-ipa.com",
+        "domain": "dws-ipa.com",
+	"admin_user": "DigiWas-No-Reply@dws-ipa.com",
+	"default_noreply_mailbox": "DigiWas-No-Reply@dws-ipa.com",
+	"req_details":[
+        {                            
+            "new_joiner_employee_id":"07557O",
+            "new_joiner_first_name":"Andy",
+            "new_joiner_initials":"Mr.",
+            "new_joiner_middle_name":"",
+            "new_joiner_last_name":"John",               
+            "new_joiner_contact_number":"91-8765435765",
+            "business_unit":"Finance",
+            "department_code":"DEPT001",
+            "job_title":"Finance Head",
+            "office_location":"Optimus",
+            "city_name":"Noida",
+	    "country_name":"India",
+            "employee_type":"Regular",
+            "data_folder_path":[
+                "\\\test\\testpath"
+            ],
+            "distribution_list":"TEST_DL",
+            "folder_type":[
+                "Read",
+                "Write",
+                "Modify"
+            ],  
+            "software_groups": [
+                {
+                    "software_name": "FINANCE_SOFTWARE",
+                    "persona": "Finance",
+                    "software_group": "DigiWAS-Finance",
+                    "license_type": "paid",
+                    "license_volume": 6
+                }
+            ],          
+            "new_joiner_additional_email":"",
+            "new_joiner_personal_email_id":"",
+            "new_joiner_joining_date": "21-03-2021",            
+            "new_joiner_default_hardware_required":"No",
+            "new_joiner_default_hardware_type":"Laptop",
+            "new_joiner_default_hardware_os":"Windows",
+            "new_joiner_vpn_required":"No",
+            "new_joiner_deskphone_required":"No",
+            "new_joiner_o365_license":"E3"                     
+        }
+    ],
+    "appConnect_url": "https://ac12954e.us-south.apigw.appdomain.cloud",
+    "ritm_details": {
+        "req_create_user": "RITM0016411",
+        "req_default_folder_access": "RITM0016414",
+        "req_distribution_list": "RITM0016410",
+        "req_mailbox": "RITM0016412",
+        "req_software": "RITM0016413"
+    },
+    "ansible_details": [
+        {
+            "job_template_name": "JML-Template",
+            "job_id": 54,
+            "job_launch_url": "https://150.238.217.12/api/v2/job_templates/54/launch/"
+        }
+    ]
+
+}

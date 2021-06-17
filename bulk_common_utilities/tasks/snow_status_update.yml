@@ -1,0 +1,27 @@
+---
+  - name: update status for SNOW
+    block:
+      - uri:
+          url: "{{ appConnect_url }}/{{ update_service_request }}"              
+          method: PUT
+          return_content: yes
+          headers: 
+            X-IBM-Client-Id: "{{ appConnectApiKey }}"          
+          body:
+            ticket_number: "{{ req_no }}"
+            ticket_data:
+              work_notes: "{{ work_notes_status_msg  }}"
+              state: "{{ Status }}"
+          body_format: json
+          validate_certs: false
+          status_code: 200
+        delegate_to: localhost
+        register: post_app_connect
+    rescue:
+      - import_role:
+          name: common_utilities
+          tasks_from: logging
+        vars:
+          exception: "{{ post_app_connect }}"
+          task_name: update status for SNOW
+          is_all_task_success: "No"          

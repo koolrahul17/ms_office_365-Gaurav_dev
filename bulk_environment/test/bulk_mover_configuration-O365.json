@@ -1,0 +1,65 @@
+{
+    "extra_vars":{ 
+        "cartridge_id": "JML_BULK",
+        "cartridge_form_id": "MOVER_BULK",
+        "req_account_name": "IBM",
+        "req_no": "REQ0011426",
+        "req_sys_id": "bb6154861be0e810bb05106a234bcbb9",
+        "req_no_creation_date": "2020-11-19 06:16:11",
+        "req_short_description": "Transfer multiple employees",
+        "manager_name" : "DigiWas.Manager",             
+        "manager_email" : "Digiwas.manager@dws-ipa.com",                                    
+        "requestor_name" : "Digiwas.HR",
+        "requestor_email" : "Digiwas.hr@dws-ipa.com",
+        "req_details":[
+        {
+            "mover_employee_id": "0213J9",
+            "mover_name": "Gaurav.Singh",            
+            "mover_email": "gaurav@dws-ipa@com",
+            "mover_additional_notification": "",
+            "current_department_name":"Finance",
+            "current_country":"India",
+            "future_department_name":"Marketing",
+            "future_business_unit": "GBS",
+            "future_manager_email": "andy.john@dws-ipa.com",
+            "future_distribution_list": "MARKETING_DL",
+            "future_office_location": "EGL,Bangalore",
+            "future_job_title": "Marketing Head",                                
+            "future_city": "Bangalore",
+            "future_country": "India",
+            "future_employee_type": "contractor",           
+            "future_data_folder_path": [
+                "\\\\ATST04\\SecDrive"
+            ],
+            "future_folder_type": [
+                "Read"
+            ],
+            "software_groups": [{
+                "software_name": "MS Project",
+                "persona": "Manager",
+                "software_group": "DigiWas-MarketingandSales",
+                "license_type": "paid",
+                "license_volume": -14
+            }], 
+            "default_group":"DWS_DEFAULT_GROUP",           
+            "vpn": "IPA_VPN_AG"
+        }
+    ],
+    "appConnect_url": "https://ac12954e.us-south.apigw.appdomain.cloud",
+    "ritm_details": {
+        "req_transfer_user": "RITM0012682",
+        "req_hardware_request": "RITM0012685",
+        "req_distribution_list": "RITM0012681",
+        "req_folder_access": "RITM0012683",
+        "req_software": "RITM0012684", 
+        "req_vpn":"RITM00145678"
+    },
+    "ansible_details": [
+        {
+            "job_template_name": "JML-Template",
+            "job_id": 54,
+            "job_launch_url": "https://150.238.217.12/api/v2/job_templates/54/launch/"
+        }
+    ]
+}
+}

@@ -1,0 +1,88 @@
+{
+	"users":[
+		 { 
+	"cartridge_id": "JML",
+	"cartridge_form_id": "JOINER",
+	"req_account_name": "Dow",
+	"req_no": "REQ0010124",
+	"req_no_creation_date": "03/09/2020",
+	"req_sys_id": "sys12343543543",
+	"req_short_description": "On boarding request for new joiner",
+	"new_joiner_employee_id": "ABC1234",
+	"new_joiner_first_name": "Javaggal",
+	"new_joiner_initials": "Mr.",
+	"new_joiner_last_name": "Srinath",
+	"manager_name": "DigiWas.Manager",
+	"manager_email": "DigiWas.Manager@dws-ipa.com",
+	"requestor_email": "DigiWas.HR@dws-ipa.com",
+	"requestor_name": "DigiWas.HR",
+	"new_joiner_contact_num": "+91-9877865432",
+	"business_unit": "GTS",
+	"department_code": "DEPT001",
+	"job_title": "Manager",
+	"office_location": "Embassy Golf Links",
+	"city_name": "Bangalore",
+	"country_name": "India",
+	"employee_type": "Regular",
+	"data_folder_path": [
+		"\\\\ATST04\\OneDrive"
+	],
+	"distribution_list": "TEST_DL",
+	"new_joiner_additional_software_id": "JML-JOINER",
+	"software_groups": [{
+			"software_name": "MS Project",
+			"software_group": "DigiWas-MarketingandSales",
+			"license_type": "paid",
+			"license_volume": 10
+		}
+	],
+	"intune_groupName": [{
+			"software_group": "IPA_SOFTWARE_PREMIUM_GROUP"
+		}
+	],
+	"vdi_groups_name": [{
+			"software_group": "IPA_SOFTWARE_PREMIUM_GROUP"
+		}
+	],
+        "ritm_details": {
+                "req_create_user": "RITM0010185",
+                "req_mailbox": "RITM0010138",
+                "req_distribution_list": "RITM0010139",
+                "req_default_folder_access": "RITM0010140",
+                "req_software":"RITM32456",
+                "req_vpn": "RITM32456",
+                "req_user_removal": "RITM32456"
+        },
+        "folder_type":["Read", "Write", "Modify"],
+	"appConnect_url": "https://ac12954e.us-south.apigw.appdomain.cloud",
+	"mover_employee_id": "",
+	"mover_name": "Harry.Ron",
+	"mover_email": "Harry.Ron@dws-ipa.com",
+	"mover_additional_notification": "",
+	"mover_movement_date_time": "",
+	"mover_time_zone": "",
+	"mover_ad_target_path": "OU=Users2,DC=Dws,DC=Ansible,DC=com",
+	"folder_permissions": "Read",
+	"mover_data_folder_access_task_details": "",
+	"mover_desk_phone_required": "",
+	"mover_desk_phone_task_details": "",
+	"mover_default_hardware_type": "",
+	"mover_default_hardware_os": "",
+	"mover_additional_details": "",
+	"mover_software_group": "IPA_SOFTWARE_PREMIUM_GROUP",
+	"mover_vpn": "IPA_VPN_AG",
+
+	"leaver_employee_id": "",
+	"leaver_name": "",
+	"leaver_disable_OU_name": "OU=Users2,DC=Dws,DC=Ansible,DC=com",
+	"leaver_additional_notification_emails": "",
+	"leaver_termination_date_time": "",
+
+	"domain": "dws-ipa.com",
+	"admin_user": "DigiWas-No-Reply@dws-ipa.com",
+	"default_noreply_mailbox": "DigiWas-No-Reply@dws-ipa.com",
+	"reserved_license_group": "DigiWas-Finance"
+
+
+}]
+}

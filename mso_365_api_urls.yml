@@ -1,0 +1,11 @@
+---
+  msonline_url: "https://login.microsoftonline.com:443"
+  auth_token_uri: "oauth2/v2.0/token"
+  grant_type: "client_credentials"
+  ms_graph_uri: "https://graph.microsoft.com"
+  default_scope: "https://graph.microsoft.com/.default"
+  get_user_url_details_uri: "{{ ms_graph_uri }}/v1.0/users"
+  user_uri: "{{ ms_graph_uri }}/v1.0/users"
+  groups_uri: "{{ ms_graph_uri }}/v1.0/groups"
+  manager_url: "{{ ms_graph_uri }}/v1.0/users/samdezoza1@M365x033589.OnMicrosoft.com/manager/$ref"
+  run: false

@@ -1,0 +1,196 @@
+- set_fact:
+     user_employee_id: "{{user_packet.leaver_employee_id}}"
+  when: cartridge_form_id == 'LEAVER_BULK' # new set_fact added
+
+- set_fact:
+     user_employee_id: "{{user_packet.mover_employee_id}}"
+  when: cartridge_form_id == 'MOVER_BULK' # new set_fact added
+
+- set_fact:
+     distribution_list: "{{user_packet.futute_distribution_list}}"
+  when: cartridge_form_id == 'MOVER_BULK' # new set_fact added
+
+- set_fact:
+     distribution_list: "{{user_packet.distribution_list}}"
+  when: cartridge_form_id == 'JOINER_BULK' # new set_fact added
+
+- debug:
+      msg: "{{user_employee_id}}"
+  when: user_employee_id is defined
+
+- name: Get Employee information using Employee Number
+  block:
+    - uri:
+        url: "{{ user_uri }}?$filter=employeeId%20eq%20'{{user_employee_id}}'" # modified the url criteria to user_employee_id to cater both movers and leavers 
+        method: GET
+        return_content: yes
+        headers:
+          Content-Type: "application/json"
+          Authorization: "Bearer {{ ms_online_access_token }}"
+        body: ""
+        body_format: json
+        validate_certs: false
+        status_code: 200
+      register: user_id
+  when: cartridge_form_id != 'JOINER_BULK'
+  rescue:
+    - import_role:
+        name: bulk_common_utilities
+        tasks_from: logging
+      vars:
+        exception: "{{ user_id }}"
+        task_name: Get Employee information using Employee Number
+        is_all_task_success: "No"
+
+ 
+- set_fact: 
+    userid: "{{user_id.json.value[0].id}}"
+  when: cartridge_form_id != 'JOINER_BULK'
+  ignore_errors: yes #if no user exists with the employee ID mentioned in the payload, ignore the error and do not create userid variable
+
+
+- set_fact: 
+    userName: "{{user_id.json.value[0].userPrincipalName}}"
+  when: cartridge_form_id != 'JOINER_BULK' and userid is defined
+
+
+- name: Get Group ids for passed software groups
+  block:
+    - uri:
+        url: "{{ groups_uri }}?$filter=displayName%20eq%20'{{ software_groups_item.software_group }}'&$select=id"
+        method: GET
+        return_content: yes
+        headers:
+          Content-Type: "application/x-www-form-urlencoded"
+          Authorization: "Bearer {{ ms_online_access_token }}"
+        validate_certs: false
+        status_code: 200
+      register: get_api_result_group_details
+      #when: uri_method == 'GET'
+      loop: "{{user_packet.software_groups}}"
+      loop_control:
+        loop_var: software_groups_item
+  when: ritm_details.req_software is defined and cartridge_form_id != 'LEAVER_BULK' #added leaver_bulk as another criteria
+  rescue:
+    - include_tasks: logging.yml
+      vars:
+        exception: "{{ get_api_result_group_details }}"
+        task_name: Get Group ids for passed software groups
+        is_all_task_success: "No"
+        statusMsg: "Failure while fetching Group ids for Group Names"
+        status: "{{ Failed_state }}"
+
+- name: Get Id for Distribution List
+  block:
+    - uri:
+        url: "{{ groups_uri }}?$filter=displayName%20eq%20'{{ distribution_list }}'&$select=id"
+        method: GET
+        return_content: yes
+        headers:
+          Content-Type: "application/x-www-form-urlencoded"
+          Authorization: "Bearer {{ ms_online_access_token }}"
+        validate_certs: false
+        status_code: 200
+      register: distribution_list_id
+  when: ritm_details.req_distribution_list is defined  and cartridge_form_id != 'LEAVER_BULK'
+  rescue:
+    - include_tasks: logging.yml
+      vars:
+        exception: "{{ distribution_list_id }}"
+        task_name: Get Id for Distribution List
+        is_all_task_success: "No"
+        statusMsg: "Failure while fetching id for Distribution List"
+        status: "{{ Failed_state }}"
+
+- name: Get Id for VPN ## Added for Movers - VPN request
+  block:
+    - uri:
+        url: "{{ groups_uri }}?$filter=displayName%20eq%20'{{ user_packet.future_vpn }}'&$select=id"
+        method: GET
+        return_content: yes
+        headers:
+          Content-Type: "application/x-www-form-urlencoded"
+          Authorization: "Bearer {{ ms_online_access_token }}"
+        validate_certs: false
+        status_code: 200
+      register: vpn_id
+  when: ritm_details.req_vpn is defined and cartridge_form_id == 'MOVER_BULK'
+  rescue:
+    - include_tasks: logging.yml
+      vars:
+        exception: "{{ vpn_id }}"
+        task_name: Get Id for VPN Group
+        is_all_task_success: "No"
+        statusMsg: "Failure while fetching id for VPN Group"
+        status: "{{ Failed_state }}"
+
+- name: Get Id for Default group # Updated label for default group
+  block:
+    - uri:
+        url: "{{ groups_uri }}?$filter=displayName%20eq%20'{{ user_packet.default_group }}'&$select=id" # renamed the label as per payboad
+        method: GET
+        return_content: yes
+        headers:
+          Content-Type: "application/x-www-form-urlencoded"
+          Authorization: "Bearer {{ ms_online_access_token }}"
+        validate_certs: false
+        status_code: 200
+      register: default_group_data
+  when: user_packet.default_group is defined # Renamed the label as per payload
+  rescue:
+    - include_tasks: logging.yml
+      vars:
+        exception: "{{ default_group_data }}" # Renamed the label as per payload
+        task_name: Get Id for Default group
+        is_all_task_success: "No"
+        statusMsg: "Failure while fetching id for Reserved license group"
+        status: "{{ Failed_state }}"
+
+- set_fact:
+    default_group_id: "{{ default_group_data.json.value[0].id }}"
+  when: user_packet.default_group is defined #and cartridge_form_id != 'LEAVER' :::: disabled the 2nd criteria for the play to run for leaver's as well
+        # added user.packet and Renamed the label as per payload
+- set_fact:
+    group_ids: ""
+
+- set_fact:
+    group_ids: "{{ distribution_list_id.json.value[0].id }}"
+  when: ritm_details.req_distribution_list is defined and cartridge_form_id != 'LEAVER_BULK'
+
+- set_fact:
+    group_ids: "{{ group_ids }},{{ group_ids_item.json.value[0].id}}"
+  loop: "{{ get_api_result_group_details.results }}"
+  loop_control:
+         loop_var: group_ids_item
+  when: cartridge_form_id != 'LEAVER_BULK'
+        
+- set_fact:
+    group_id_string: "{{ group_ids | regex_replace('^,', '') }}"
+  when: cartridge_form_id != 'LEAVER_BULK'
+
+- set_fact:
+    group_id_list: "{{ group_id_string.split(',') }}"
+  when: cartridge_form_id != 'LEAVER_BULK'
+
+# disabling below set fact as userName has already been set above
+#- set_fact:
+    #userName: "{% if cartridge_form_id == 'MOVER_BULK' %}{{ mover_name }}@{{ domain }}{% elif cartridge_form_id == 'LEAVER_BULK' %}{{ leaver_name }}@{{ domain }}{% endif %}"
+   
+
+#disabling below code as it is not needed after the implementation of "Get Employee information using Employee Number" play
+#- name: Get user details
+#  uri:
+#    url: "{{ ms_graph_uri }}/v1.0/users/{{ userName }}"
+#    method: GET
+#    return_content: yes
+#    headers:
+#      Content-Type: "application/x-www-form-urlencoded"
+#      Authorization: "Bearer {{ ms_online_access_token }}"
+#    validate_certs: false
+#    status_code: 200
+#  register: user_details
+#  when: cartridge_form_id == 'MOVER_BULK' or cartridge_form_id == 'LEAVER_BULK'
+
+#- set_fact:
+#    user_details: "{{ user_details }}"
+#  when: cartridge_form_id == 'MOVER_BULK' or cartridge_form_id == 'LEAVER_BULK'

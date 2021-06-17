@@ -1,0 +1,6 @@
+---
+# defaults file for mso_mover
+user_transfer_result: ""
+dl_software_folder_worknotes: ""
+vpn_add_worknotes: ""
+bulk_mail_worklog: ""
